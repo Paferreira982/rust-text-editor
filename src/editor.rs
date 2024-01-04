@@ -3,14 +3,19 @@ use termion::event::Key;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
+pub struct Position {
+    pub x: usize,
+    pub y: usize,
+}
+
 pub struct Editor {
     should_quit: bool,
     terminal: Terminal,
+    cursor_position: Position,
 }
 
 impl Editor {
     pub fn run(&mut self) {
-
         loop {
             if let Err(error) = self.refresh_screen() {
                 die(&error);
@@ -30,19 +35,20 @@ impl Editor {
         Self {
             should_quit: false,
             terminal: Terminal::default().expect("Failed to initialize terminal"),
+            cursor_position: Position { x: 0, y: 0 },
         }
     }
 
     fn refresh_screen(&self) -> Result<(), std::io::Error> {
         Terminal::cursor_hide();
-        Terminal::cursor_position(0, 0);
+        Terminal::cursor_position(&Position { x: 0, y: 0 });
 
         if self.should_quit {
             Terminal::clear_screen();
             println!("Closing the application.\r");
         } else {
             self.draw_rows();
-            Terminal::cursor_position(0, 0);
+            Terminal::cursor_position(&self.cursor_position);
         }
 
         Terminal::cursor_show();
@@ -50,11 +56,49 @@ impl Editor {
     }
 
     fn process_keypress(&mut self) -> Result<(), std::io::Error> {
-        if let Key::Ctrl('q') = Terminal::read_key()? {
-            self.should_quit = true;
+        let pressed_key = Terminal::read_key()?;
+        match pressed_key {
+            Key::Ctrl('q') => self.should_quit = true,
+            Key::Up 
+            | Key::Down 
+            | Key::Left 
+            | Key::Right 
+            | Key::PageUp
+            | Key::PageDown
+            | Key::End
+            | Key::Home => self.move_cursor(pressed_key),
+            _ => (),
         }
 
         Ok(())
+    }
+
+    fn move_cursor(&mut self, key: Key) {
+        let Position { mut y, mut x } = self.cursor_position;
+        let size = self.terminal.size();
+        let height = size.height.saturating_sub(1) as usize;
+        let width = size.width.saturating_sub(1) as usize;
+
+        match key {
+            Key::Up => y = y.saturating_sub(1),
+            Key::Down => {
+                if y < height {
+                    y = y.saturating_add(1)
+                }
+            }
+            Key::Left => x = x.saturating_sub(1),
+            Key::Right => {
+                if x < width {
+                    x = x.saturating_add(1)
+                }
+            }
+            Key::PageUp => y = 0,
+            Key::PageDown => y = height,
+            Key::Home => x = 0,
+            Key::End => x = width,
+            _ => (),
+        }
+        self.cursor_position = Position { x , y }
     }
 
     fn draw_rows(&self) {
