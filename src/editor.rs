@@ -1,6 +1,8 @@
 use crate::Terminal;
 use termion::event::Key;
 
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
 pub struct Editor {
     should_quit: bool,
     terminal: Terminal,
@@ -33,14 +35,14 @@ impl Editor {
 
     fn refresh_screen(&self) -> Result<(), std::io::Error> {
         Terminal::cursor_hide();
-        Terminal::cursor_position(0,0);
+        Terminal::cursor_position(0, 0);
 
         if self.should_quit {
             Terminal::clear_screen();
             println!("Closing the application.\r");
         } else {
             self.draw_rows();
-            Terminal::cursor_position(0,0);
+            Terminal::cursor_position(0, 0);
         }
 
         Terminal::cursor_show();
@@ -56,10 +58,26 @@ impl Editor {
     }
 
     fn draw_rows(&self) {
-        for _ in 0..self.terminal.size().height - 1 {
+        let height = self.terminal.size().height;
+
+        for row in 0..height - 1 {
             Terminal::clear_current_line();
-            println!("~\r");
+            if row == height / 3 {
+                self.draw_wc_message();
+            } else {
+                println!("~\r");
+            }
         }
+    }
+
+    fn draw_wc_message(&self) {
+        let mut wc_message = format!("Rust Vi editor -- version {}\r", VERSION);
+        let width = self.terminal.size().width as usize;
+        let padding = width.saturating_sub(wc_message.len()) / 2;
+        let spaces = " ".repeat(padding.saturating_sub(1));
+        wc_message = format!("~{}{}", spaces, wc_message);
+        wc_message.truncate(width);
+        println!("{}\r", wc_message);
     }
 }
 
