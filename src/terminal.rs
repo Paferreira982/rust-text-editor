@@ -32,14 +32,14 @@ impl Terminal {
     }
 
     pub fn clear_screen() {
-        println!("{}", termion::clear::All);
+        print!("{}", termion::clear::All);
     }
 
     pub fn cursor_position(position: &Position) {
         let Position{x, y} = position;
         let x = x.saturating_add(1) as u16;
         let y = y.saturating_add(1) as u16;
-        println!("{}", termion::cursor::Goto(x,y));
+        print!("{}", termion::cursor::Goto(x,y));
     }
 
     pub fn flush() -> Result<(), std::io::Error> {

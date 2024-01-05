@@ -183,7 +183,7 @@ impl Editor {
             }
             Key::PageUp => {
                 y = if y > terminal_height {
-                    y - terminal_height as usize
+                    y - terminal_height
                 } else {
                     0
                 }
@@ -272,7 +272,7 @@ impl Editor {
         if Instant::now() - message.time < Duration::new(5, 0) {
             let mut text = message.text.clone();
             text.truncate(self.terminal.size().width as usize);
-            print!("{}\r", text);
+            print!("{}", text);
         }
     }
 
