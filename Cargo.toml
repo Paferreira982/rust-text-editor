@@ -1,6 +1,6 @@
 [package]
 name = "rust-pad"
-version = "0.8.1"
+version = "0.8.2"
 authors = ["Pedro Almeida <contact@pedroalmeida.dev>"]
 edition = "2021"
 
@@ -8,3 +8,4 @@ edition = "2021"
 
 [dependencies]
 termion="2.0.3"
+unicode-segmentation="1.8.0"
