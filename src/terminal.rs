@@ -1,5 +1,6 @@
 use crate::Position;
 use std::io::{self, stdout, Write};
+use termion::color;
 use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::{IntoRawMode, RawTerminal};
@@ -20,7 +21,7 @@ impl Terminal {
         Ok(Self {
             size: Size {
                 width: size.0,
-                height: size.1,
+                height: size.1.saturating_sub(2),
             },
             _stdout: stdout().into_raw_mode()?,
         })
@@ -31,14 +32,14 @@ impl Terminal {
     }
 
     pub fn clear_screen() {
-        println!("{}", termion::clear::All);
+        print!("{}", termion::clear::All);
     }
 
     pub fn cursor_position(position: &Position) {
         let Position{x, y} = position;
         let x = x.saturating_add(1) as u16;
         let y = y.saturating_add(1) as u16;
-        println!("{}", termion::cursor::Goto(x,y));
+        print!("{}", termion::cursor::Goto(x,y));
     }
 
     pub fn flush() -> Result<(), std::io::Error> {
@@ -63,5 +64,21 @@ impl Terminal {
 
     pub fn clear_current_line() {
         print!("{}", termion::clear::CurrentLine);
+    }
+
+    pub fn set_bg_color(color: color::Rgb) {
+        print!("{}", color::Bg(color));
+    }
+
+    pub fn reset_bg_color() {
+        print!("{}", color::Bg(color::Reset));
+    }
+
+    pub fn set_fg_color(color: color::Rgb) {
+        print!("{}", color::Fg(color));
+    }
+
+    pub fn reset_fg_color() {
+        print!("{}", color::Fg(color::Reset));
     }
 }
