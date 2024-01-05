@@ -2,8 +2,11 @@ use crate::Document;
 use crate::Row;
 use crate::Terminal;
 use std::env;
+use termion::color;
 use termion::event::Key;
 
+const STATUS_FG_COLOR: color::Rgb = color::Rgb(63, 63, 63);
+const STATUS_BG_COLOR: color::Rgb = color::Rgb(239, 239, 239);
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[derive(Default)]
@@ -67,6 +70,8 @@ impl Editor {
             println!("Closing the application.\r");
         } else {
             self.draw_rows();
+            self.draw_status_bar();
+            self.draw_message_bar();
             Terminal::cursor_position(&self.cursor_position);
         }
 
@@ -192,7 +197,7 @@ impl Editor {
     fn draw_rows(&self) {
         let height = self.terminal.size().height;
 
-        for terminal_row in 0..height - 1 {
+        for terminal_row in 0..height {
             Terminal::clear_current_line();
             if let Some(row) = self.document.row(terminal_row as usize + self.offset.y) {
                 self.draw_row(row);
@@ -202,6 +207,40 @@ impl Editor {
                 println!("~\r");
             }
         }
+    }
+
+    fn draw_status_bar(&self) {
+        let mut status: String;
+        let width = self.terminal.size().width as usize;
+        let mut file_name = "[No Name]".to_string();
+
+        if let Some(name) = &self.document.file_name {
+            file_name = name.clone();
+            file_name.truncate(20)
+        }
+
+        status = format!("{} - {} lines", file_name, self.document.len());
+        let line_indicator = format!(
+            "{}/{}",
+            self.cursor_position.y.saturating_add(1),
+            self.document.len()
+        );
+        let len = status.len() + line_indicator.len();
+        if width > len {
+            status.push_str(&" ".repeat(width - len));
+        }
+        status = format!("{}{}", status, line_indicator);
+        status.truncate(width);
+
+        Terminal::set_bg_color(STATUS_BG_COLOR);
+        Terminal::set_fg_color(STATUS_FG_COLOR);
+        println!("{}\r", status);
+        Terminal::reset_fg_color();
+        Terminal::reset_bg_color();
+    }
+
+    fn draw_message_bar(&self) {
+        Terminal::clear_current_line();
     }
 
     fn draw_wc_message(&self) {
