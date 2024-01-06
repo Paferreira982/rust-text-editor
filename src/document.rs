@@ -1,5 +1,6 @@
 use crate::Position;
 use crate::Row;
+use crate::SearchDirection;
 use std::fs;
 use std::io::{Error, Write};
 
@@ -15,7 +16,9 @@ impl Document {
         let contents = fs::read_to_string(filename)?;
         let mut rows = Vec::new();
         for value in contents.lines() {
-            rows.push(Row::from(value));
+            let mut row = Row::from(value);
+            row.highlight(None);
+            rows.push(row);
         }
 
         Ok(Self { 
@@ -48,7 +51,11 @@ impl Document {
         }
 
         #[allow(clippy::indexing_slicing)]
-        let new_row = self.rows[at.y].split(at.x);
+        let current_row = &mut self.rows[at.y];
+        let mut new_row = current_row.split(at.x);
+
+        current_row.highlight(None);
+        new_row.highlight(None);
 
         #[allow(clippy::integer_arithmetic)]
         self.rows.insert(at.y + 1, new_row);
@@ -68,11 +75,13 @@ impl Document {
         if at.y == self.rows.len() {
             let mut row = Row::default();
             row.insert(0, c);
+            row.highlight(None);
             self.rows.push(row);
         } else {
             #[allow(clippy::indexing_slicing)]
             let row = &mut self.rows[at.y];
-            row.insert(at.x, c);            
+            row.insert(at.x, c);    
+            row.highlight(None);        
         }
     }
 
@@ -90,9 +99,11 @@ impl Document {
             let next_row = self.rows.remove(at.y + 1);
             let row = &mut self.rows[at.y];
             row.append(&next_row);
+            row.highlight(None);
         } else {
             let row = &mut self.rows[at.y];
             row.delete(at.x);
+            row.highlight(None);
         }
     }
 
@@ -111,5 +122,52 @@ impl Document {
 
     pub fn is_dirty(&self) -> bool {
         self.dirty
+    }
+
+    #[allow(clippy::indexing_slicing)]
+    pub fn find(&self, query: &str, at: &Position, direction: SearchDirection) -> Option<Position> {
+        if at.y >= self.rows.len() {
+            return None;
+        }
+
+        let mut position = Position { x: at.x, y: at.y };
+
+        let start = if direction == SearchDirection::Forward {
+            at.y
+        } else {
+            0
+        };
+
+        let end = if direction == SearchDirection::Forward {
+            self.rows.len()
+        } else {
+            at.y.saturating_add(1)
+        };
+
+        for _ in start..end {
+            if let Some(row) = self.rows.get(position.y) {
+                if let Some(x) = row.find(&query, position.x, direction) {
+                    position.x = x;
+                    return Some(position);
+                }
+
+                if direction == SearchDirection::Forward {
+                    position.y = position.y.saturating_add(1);
+                    position.x = 0;
+                } else {
+                    position.y = position.y.saturating_sub(1);
+                    position.x = self.rows[position.y].len();
+                }
+            } else {
+                return None;
+            }
+        }
+        None
+    }
+
+    pub fn highlight(&mut self, word: Option<&str>) {
+        for row in &mut self.rows {
+            row.highlight(word);
+        }
     }
 }
