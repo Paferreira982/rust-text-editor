@@ -1,6 +1,6 @@
 [package]
 name = "rust-pad"
-version = "0.16.6"
+version = "0.17.6"
 authors = ["Pedro Almeida <contact@pedroalmeida.dev>"]
 edition = "2021"
 
