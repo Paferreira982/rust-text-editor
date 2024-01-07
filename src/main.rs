@@ -10,15 +10,18 @@
 
 mod row;
 mod editor;
+mod filetype;
 mod terminal;
 mod document;
 mod highlighting;
 
 pub use row::Row;
 pub use editor::Position;
+pub use filetype::FileType;
 pub use document::Document;
 pub use terminal::Terminal;
 pub use editor::SearchDirection;
+pub use filetype::HighlightingOptions;
 
 use editor::Editor;
 
