@@ -38,9 +38,9 @@ Apesar de não utilizar todas as características apresentadas devido ao escopo 
 
 [x] **Navegação:** <small><i>Capacidade de scrollar o conteúdo do arquivo de texto.</i></small>
 
-[X] **Barra de Status:** <small><i>Capacidade de exibir informações sobre o arquivo de texto atual, como o nome do arquivo, o número da linha atual, número total de linhas e o tipo do arquivo.</i></small>
+[x] **Barra de Status:** <small><i>Capacidade de exibir informações sobre o arquivo de texto atual, como o nome do arquivo, o número da linha atual, número total de linhas e o tipo do arquivo.</i></small>
 
-[X] **Prompt e Mensagens:** <small><i>Capacidade de exibir mensagens e capturar comandos do usuário via prompt.</i></small>
+[x] **Prompt e Mensagens:** <small><i>Capacidade de exibir mensagens e capturar comandos do usuário via prompt.</i></small>
 
 [x] **Edição de Texto:** <small><i>Capacidade de editar o conteúdo de um arquivo de texto, editando linhas já existentes ou adicionando novas linhas.</i></small>
 
@@ -50,7 +50,7 @@ Apesar de não utilizar todas as características apresentadas devido ao escopo 
 
 [x] **Salvar Como:** <small><i>Capacidade de salvar o conteúdo de um arquivo de texto em um novo caminho.</i></small>
 
-[X] **Detectar Alterações:** <small><i>Capacidade de detectar se o conteúdo de um arquivo de texto foi alterado desde a última vez que foi salvo.</i></small>
+[x] **Detectar Alterações:** <small><i>Capacidade de detectar se o conteúdo de um arquivo de texto foi alterado desde a última vez que foi salvo.</i></small>
 
 [x] **Confirmar Sair Sem Salvar:** <small><i>Capacidade de confirmar a saída do editor de texto sem salvar o conteúdo do arquivo de texto.</i></small>
 
