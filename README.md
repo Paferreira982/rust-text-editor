@@ -38,9 +38,9 @@ Although not utilizing all presented features due to the project's scope, Rust s
 
 [x] **Navigation:** <small><i>Ability to scroll through the content of the text file.</i></small>
 
-[X] **Status Bar:** <small><i>Ability to display information about the current text file, such as the file name, current line number, total number of lines, and file type.</i></small>
+[x] **Status Bar:** <small><i>Ability to display information about the current text file, such as the file name, current line number, total number of lines, and file type.</i></small>
 
-[X] **Prompt and Messages:** <small><i>Ability to display messages and capture user commands via a prompt.</i></small>
+[x] **Prompt and Messages:** <small><i>Ability to display messages and capture user commands via a prompt.</i></small>
 
 [x] **Text Editing:** <small><i>Ability to edit the content of a text file, editing existing lines or adding new lines.</i></small>
 
@@ -50,7 +50,7 @@ Although not utilizing all presented features due to the project's scope, Rust s
 
 [x] **Save As:** <small><i>Ability to save the content of a text file to a new path.</i></small>
 
-[X] **Detect Changes:** <small><i>Ability to detect if the content of a text file has changed since the last save.</i></small>
+[x] **Detect Changes:** <small><i>Ability to detect if the content of a text file has changed since the last save.</i></small>
 
 [x] **Confirm Exit Without Saving:** <small><i>Ability to confirm exiting the text editor without saving the content of the text file.</i></small>
 
