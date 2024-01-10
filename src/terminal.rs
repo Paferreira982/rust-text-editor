@@ -1,9 +1,14 @@
-use crate::Position;
+use crate::{Position, Theme};
 use std::io::{self, stdout, Write};
 use termion::color;
 use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::{IntoRawMode, RawTerminal};
+
+pub enum TerminalStruct {
+    StatusBarBgColor,
+    StatusBarFgColor,
+}
 
 pub struct Size {
     pub width: u16,
@@ -66,19 +71,29 @@ impl Terminal {
         print!("{}", termion::clear::CurrentLine);
     }
 
-    pub fn set_bg_color(color: color::Rgb) {
-        print!("{}", color::Bg(color));
+    pub fn set_bg_color(terminal_struct: TerminalStruct, theme: &Theme) {
+        let color = match terminal_struct {
+            TerminalStruct::StatusBarBgColor => &theme.colors.background_status_bar,
+            _ => &theme.colors.background,
+        };
+
+        print!("{}", color::Bg(color::Rgb(color.r, color.g, color.b)));
     }
 
-    pub fn reset_bg_color() {
-        print!("{}", color::Bg(color::Reset));
+    pub fn reset_bg_color(theme: &Theme) {
+        print!("{}", color::Bg(theme.bg_reset()));
     }
 
-    pub fn set_fg_color(color: color::Rgb) {
-        print!("{}", color::Fg(color));
+    pub fn set_fg_color(terminal_struct: TerminalStruct, theme: &Theme) {
+        let color = match terminal_struct {
+            TerminalStruct::StatusBarFgColor => &theme.colors.text_status_bar,
+            _ => &theme.colors.texts,
+        };
+
+        print!("{}", color::Fg(color::Rgb(color.r, color.g, color.b)));
     }
 
-    pub fn reset_fg_color() {
-        print!("{}", color::Fg(color::Reset));
+    pub fn reset_fg_color(theme: &Theme) {
+        print!("{}", color::Fg(theme.fg_reset()));
     }
 }

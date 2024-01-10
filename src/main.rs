@@ -9,17 +9,19 @@
 )]
 
 mod row;
+mod theme;
 mod editor;
 mod filetype;
 mod terminal;
 mod document;
-mod highlighting;
 
 pub use row::Row;
+pub use theme::{Theme, ThemeType};
 pub use editor::Position;
 pub use filetype::FileType;
 pub use document::Document;
 pub use terminal::Terminal;
+pub use terminal::TerminalStruct;
 pub use editor::SearchDirection;
 pub use filetype::HighlightingOptions;
 
