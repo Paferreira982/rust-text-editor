@@ -1,6 +1,6 @@
-use crate::highlighting;
 use crate::SearchDirection;
 use crate::HighlightingOptions;
+use crate::theme::{Theme, ThemeType};
 use std::cmp;
 use termion::color;
 use unicode_segmentation::UnicodeSegmentation;
@@ -8,7 +8,7 @@ use unicode_segmentation::UnicodeSegmentation;
 #[derive(Default)]
 pub struct Row {
     string: String,
-    highlighting: Vec<highlighting::Type>,
+    highlighting: Vec<ThemeType>,
     pub is_highlighted: bool,
     len: usize,
 }
@@ -25,11 +25,11 @@ impl From<&str> for Row {
 }
 
 impl Row {
-    pub fn render(&self, start: usize, end: usize) -> String {
+    pub fn render(&self, start: usize, end: usize, theme: &Theme) -> String {
         let end = cmp::min(end, self.string.len());
         let start = cmp::min(start, end);
         let mut result = String::new();
-        let mut current_highlighting = &highlighting::Type::None;
+        let mut current_highlighting = &ThemeType::None;
 
         #[allow(clippy::integer_arithmetic)]
         for (index, grapheme) in self.string[..]
@@ -42,13 +42,13 @@ impl Row {
                 let highlighting_type = self
                     .highlighting
                     .get(index)
-                    .unwrap_or(&highlighting::Type::None);
+                    .unwrap_or(&ThemeType::None);
 
                 if highlighting_type != current_highlighting {
                     current_highlighting = highlighting_type;
 
                     let start_highlight = 
-                        format!("{}", color::Fg(highlighting_type.to_color()));
+                        format!("{}", color::Fg(theme.to_color(highlighting_type)));
 
                     result.push_str(&start_highlight[..]);
                 }
@@ -61,7 +61,7 @@ impl Row {
             }
         }
         
-        let end_highlight = format!("{}", color::Fg(color::Reset));
+        let end_highlight = format!("{}", color::Fg(theme.fg_reset()));
         result.push_str(&end_highlight[..]);
         result
     }
@@ -205,7 +205,7 @@ impl Row {
                 {
                     #[allow(clippy::indexing_slicing)]
                     for i in search_match..next_index {
-                        self.highlighting[i] = highlighting::Type::Match;
+                        self.highlighting[i] = ThemeType::Match;
                     }
                     index = next_index;
                 } else {
@@ -220,7 +220,7 @@ impl Row {
         index: &mut usize,
         substring: &str,
         chars: &[char],
-        hl_type: highlighting::Type,
+        hl_type: ThemeType,
     ) -> bool {
         if substring.is_empty() {
             return false;
@@ -246,7 +246,7 @@ impl Row {
         index: &mut usize,
         chars: &[char],
         keywords: &[String],
-        hl_type: highlighting::Type,
+        hl_type: ThemeType,
     ) -> bool {
 
         if *index > 0 {
@@ -285,7 +285,7 @@ impl Row {
             index,
             chars,
             opts.primary_keywords(),
-            highlighting::Type::PrimaryKeywords,
+            ThemeType::PrimaryKeywords,
         )
     }
 
@@ -299,7 +299,7 @@ impl Row {
             index,
             chars,
             opts.secondary_keywords(),
-            highlighting::Type::SecondaryKeywords,
+            ThemeType::SecondaryKeywords,
         )
     }
 
@@ -320,7 +320,7 @@ impl Row {
                 if let Some(closing_char) = chars.get(closing_index) {
                     if *closing_char == '\'' {
                         for _ in 0..=closing_index.saturating_sub(*index) {
-                            self.highlighting.push(highlighting::Type::Character);
+                            self.highlighting.push(ThemeType::Character);
                             *index += 1;
                         }
                         return true;
@@ -342,7 +342,7 @@ impl Row {
             if let Some(next_char) = chars.get(index.saturating_add(1)) {
                 if *next_char == '/' {
                     for _ in *index..chars.len() {
-                        self.highlighting.push(highlighting::Type::Comment);
+                        self.highlighting.push(ThemeType::Comment);
                         *index += 1;
                     }
                     return true;
@@ -370,7 +370,7 @@ impl Row {
                             chars.len()
                         };
                     for _ in *index..closing_index {
-                        self.highlighting.push(highlighting::Type::MultilineComment);
+                        self.highlighting.push(ThemeType::MultilineComment);
                         *index += 1;
                     }
                     return true;
@@ -389,7 +389,7 @@ impl Row {
     ) -> bool {
         if opts.strings() && c == '"' {
             loop {
-                self.highlighting.push(highlighting::Type::String);
+                self.highlighting.push(ThemeType::String);
                 *index += 1;
                 if let Some(next_char) = chars.get(*index) {
                     if *next_char == '"' {
@@ -399,7 +399,7 @@ impl Row {
                     break;
                 }
             }
-            self.highlighting.push(highlighting::Type::String);
+            self.highlighting.push(ThemeType::String);
             *index += 1;
             return true;
         }
@@ -422,7 +422,7 @@ impl Row {
                 }
             }
             loop {
-                self.highlighting.push(highlighting::Type::Number);
+                self.highlighting.push(ThemeType::Number);
                 *index += 1;
                 if let Some(next_char) = chars.get(*index) {
                     if *next_char != '.' && !next_char.is_ascii_digit() {
@@ -447,7 +447,7 @@ impl Row {
         let chars: Vec<char> = self.string.chars().collect();
         if self.is_highlighted && word.is_none() {
             if let Some(hl_type) = self.highlighting.last() {
-                if *hl_type == highlighting::Type::MultilineComment
+                if *hl_type == ThemeType::MultilineComment
                     && self.string.len() > 1
                     && self.string[self.string.len() - 2..] == *"*/"
                 {
@@ -468,7 +468,7 @@ impl Row {
                 chars.len()
             };
             for _ in 0..closing_index {
-                self.highlighting.push(highlighting::Type::MultilineComment);
+                self.highlighting.push(ThemeType::MultilineComment);
             }
             index = closing_index;
         }
@@ -490,7 +490,7 @@ impl Row {
                 continue;
             }
 
-            self.highlighting.push(highlighting::Type::None);
+            self.highlighting.push(ThemeType::None);
             index += 1;
         }
 

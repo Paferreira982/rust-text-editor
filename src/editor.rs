@@ -1,14 +1,14 @@
 use crate::Document;
 use crate::Row;
+use crate::TerminalStruct;
+use crate::theme;
+use crate::theme::Theme;
 use crate::Terminal;
 use std::env;
 use std::time::Duration;
 use std::time::Instant;
-use termion::color;
 use termion::event::Key;
 
-const STATUS_FG_COLOR: color::Rgb = color::Rgb(63, 63, 63);
-const STATUS_BG_COLOR: color::Rgb = color::Rgb(239, 239, 239);
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const QUIT_TIMES: u8 = 3;
 
@@ -47,10 +47,15 @@ pub struct Editor {
     status_message: StatusMessage,
     quit_times: u8,
     highlighted_word: Option<String>,
+    theme: Theme,
 }
 
 impl Editor {
     pub fn run(&mut self) {
+        if let Err(error) = self.refresh_screen() {
+            die(&error);
+        }
+
         loop {
             if let Err(error) = self.refresh_screen() {
                 die(&error);
@@ -69,7 +74,7 @@ impl Editor {
     pub fn default() -> Self {
         let args: Vec<String> = env::args().collect();
         let mut initial_status = 
-            String::from("HELP: Ctrl-F = find | Ctrl-S = save | Ctrl-Q = quit");
+            String::from("HELP: Ctrl-F = find | Ctrl-S = save | Ctrl-T = change theme | Ctrl-Q = quit");
         
         let document = if let Some(file_name) = args.get(1) {
             let doc = Document::open(file_name);
@@ -94,6 +99,7 @@ impl Editor {
             status_message: StatusMessage::from(initial_status),
             quit_times: QUIT_TIMES,
             highlighted_word: None,
+            theme: Theme::default(),
         }
     }
 
@@ -200,10 +206,35 @@ impl Editor {
                     self.quit_times -= 1;
                     return Ok(());
                 }
+                
+                if self.theme.name != "default" {
+                    self.theme.change_theme(theme::Themes::Original);
+                    self.refresh_screen()?;
+                }
+                
                 self.should_quit = true
             }
             Key::Ctrl('s') => self.save(),
             Key::Ctrl('f') => self.search(),
+            Key::Ctrl('t') => {
+                let prompt_str = format!("Change to Theme ({}): ", theme::Theme::get_possibles_themes());
+                let theme = self.prompt(
+                    &prompt_str,
+                    |_, _, _| {}).unwrap_or(None);
+
+                if let Some(theme) = theme {
+                    let new_theme = theme::Themes::from(theme.to_lowercase().as_str());
+                    
+                    if new_theme == theme::Themes::None {
+                        let prompt_str = format!("Theme not found: '{}', please choose one of the following themes: {}", theme, theme::Theme::get_possibles_themes());
+                        self.status_message = StatusMessage::from(prompt_str);
+                        return Ok(());
+                    }
+
+                    self.theme.change_theme(new_theme);
+                    self.refresh_screen()?;
+                }
+            }
             Key::Char(c) => {
                 self.document.insert(&self.cursor_position, c);
                 self.move_cursor(Key::Right);
@@ -326,7 +357,7 @@ impl Editor {
         let width = self.terminal.size().width as usize;
         let start = self.offset.x;
         let end = self.offset.x.saturating_add(width);
-        let row = row.render(start, end);
+        let row = row.render(start, end, &self.theme);
         println!("{}\r", row)
     }
 
@@ -354,7 +385,7 @@ impl Editor {
         let width = self.terminal.size().width as usize;
 
         let modified_indicator = if self.document.is_dirty() {
-            "(modified)"
+            "(modified) "
         } else {
             ""
         };
@@ -379,8 +410,11 @@ impl Editor {
             self.cursor_position.y.saturating_add(1)
         };
 
+        let theme_name = &self.theme.name;
+
         let line_indicator = format!(
-            "{} | {}/{}",
+            "Theme: {} | File Type: {} | {}/{}",
+            theme_name,
             self.document.file_type(),
             current_line,
             self.document.len()
@@ -392,11 +426,11 @@ impl Editor {
         status = format!("{}{}", status, line_indicator);
         status.truncate(width);
 
-        Terminal::set_bg_color(STATUS_BG_COLOR);
-        Terminal::set_fg_color(STATUS_FG_COLOR);
+        Terminal::set_bg_color(TerminalStruct::StatusBarBgColor, &self.theme);
+        Terminal::set_fg_color(TerminalStruct::StatusBarFgColor, &self.theme);
         println!("{}\r", status);
-        Terminal::reset_fg_color();
-        Terminal::reset_bg_color();
+        Terminal::reset_fg_color(&self.theme);
+        Terminal::reset_bg_color(&self.theme);
     }
 
     fn draw_message_bar(&self) {
