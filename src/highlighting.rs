@@ -23,7 +23,7 @@ impl Type {
             Type::Comment | Type::MultilineComment => color::Rgb(133, 153, 0),
             Type::PrimaryKeywords => color::Rgb(181, 137, 0),
             Type::SecondaryKeywords => color::Rgb(42, 161, 152),
-            _ => color::Rgb(255, 255, 255),
+            _ => color::Rgb(200, 200, 200),
         }
     }
 }

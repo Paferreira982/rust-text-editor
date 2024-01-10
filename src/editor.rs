@@ -256,7 +256,7 @@ impl Editor {
     fn move_cursor(&mut self, key: Key) {
         let terminal_height = self.terminal.size().height as usize;
         let Position { mut y, mut x } = self.cursor_position;
-        let height = self.document.len();
+        let height = self.document.len().saturating_sub(1);
         let mut width = if let Some(row) = self.document.row(y) {
             row.len()
         } else {
@@ -373,10 +373,16 @@ impl Editor {
             modified_indicator
         );
 
+        let current_line = if self.document.len() == 0 {
+            0
+        } else {
+            self.cursor_position.y.saturating_add(1)
+        };
+
         let line_indicator = format!(
             "{} | {}/{}",
             self.document.file_type(),
-            self.cursor_position.y.saturating_add(1),
+            current_line,
             self.document.len()
         );
 
