@@ -12,6 +12,10 @@ pub struct HighlightingOptions {
     multiline_comments: bool,
     primary_keywords: Vec<String>,
     secondary_keywords: Vec<String>,
+    operators: Vec<String>,
+    methods: bool,
+    atrributes: bool,
+    separator: bool,
 }
 
 impl Default for FileType {
@@ -42,6 +46,9 @@ impl FileType {
                     characters: true,
                     comments: true,
                     multiline_comments: true,
+                    methods: true,
+                    atrributes: true,
+                    separator: true,
                     primary_keywords: vec![
                         "as".to_string(),
                         "break".to_string(),
@@ -111,6 +118,56 @@ impl FileType {
                         "f32".to_string(),
                         "f64".to_string(),
                     ],
+                    operators: vec![
+                        "+".to_string(),
+                        "-".to_string(),
+                        "*".to_string(),
+                        "/".to_string(),
+                        "%".to_string(),
+                        "^".to_string(),
+                        "&".to_string(),
+                        "|".to_string(),
+                        "!".to_string(),
+                        "~".to_string(),
+                        "=".to_string(),
+                        "<".to_string(),
+                        ">".to_string(),
+                        "?".to_string(),
+                        ":".to_string(),
+                        "->".to_string(),
+                        "=>".to_string(),
+                        "<<".to_string(),
+                        ">>".to_string(),
+                        "++".to_string(),
+                        "--".to_string(),
+                        "+=".to_string(),
+                        "-=".to_string(),
+                        "*=".to_string(),
+                        "/=".to_string(),
+                        "%=".to_string(),
+                        "^=".to_string(),
+                        "&=".to_string(),
+                        "|=".to_string(),
+                        "==".to_string(),
+                        "!=".to_string(),
+                        "<=".to_string(),
+                        ">=".to_string(),
+                        "&&".to_string(),
+                        "||".to_string(),
+                        "++".to_string(),
+                        "--".to_string(),
+                        "..".to_string(),
+                        "...".to_string(),
+                        "->".to_string(),
+                        "=>".to_string(),
+                        "@".to_string(),
+                        "$".to_string(),
+                        "#".to_string(),
+                        "!=".to_string(),
+                        "!==".to_string(),
+                        "===".to_string(),
+                        "!===".to_string(),
+                    ]
                  },
             }
         }
@@ -146,5 +203,21 @@ impl HighlightingOptions {
 
     pub fn secondary_keywords(&self) -> &Vec<String> {
         &self.secondary_keywords
+    }
+
+    pub fn operators(&self) -> &Vec<String> {
+        &self.operators
+    }
+
+    pub fn methods(&self) -> bool {
+        self.methods
+    }
+
+    pub fn atrributes(&self) -> bool {
+        self.atrributes
+    }
+
+    pub fn separators(&self) -> bool {
+        self.separator
     }
 }

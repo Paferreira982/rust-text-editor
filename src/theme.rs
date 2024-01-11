@@ -18,6 +18,10 @@ pub struct Colors {
     pub background: Color,
     pub text_status_bar: Color,
     pub background_status_bar: Color,
+    pub methods: Color,
+    pub attributes: Color,
+    pub separator: Color,
+    pub operators: Color,
 }
 
 impl Colors {
@@ -34,6 +38,10 @@ impl Colors {
             background: Color { r: 12, g: 12, b: 12 },
             text_status_bar: Color { r: 63, g: 63, b: 63 },
             background_status_bar: Color { r: 239, g: 239, b: 239 },
+            methods: Color { r: 255, g: 0, b: 0 },
+            attributes: Color { r: 243, g: 171, b: 251 },
+            separator: Color { r: 0, g: 0, b: 255 },
+            operators: Color { r: 0, g: 255, b: 0 },
         }
     }
 }
@@ -49,6 +57,10 @@ pub enum ThemeType {
     MultilineComment,
     PrimaryKeywords,
     SecondaryKeywords,
+    Method,
+    Separator,
+    Attribute,
+    Operator,
 }
 
 #[derive(PartialEq)]
@@ -111,6 +123,10 @@ impl Theme {
             ThemeType::Comment | ThemeType::MultilineComment => &self.colors.comments,
             ThemeType::PrimaryKeywords => &self.colors.primary_keywords,
             ThemeType::SecondaryKeywords => &self.colors.secondary_keywords,
+            ThemeType::Method => &self.colors.methods,
+            ThemeType::Attribute => &self.colors.attributes,
+            ThemeType::Separator => &self.colors.separator,
+            ThemeType::Operator => &self.colors.operators,
             _ => &self.colors.texts,
         };
 
@@ -140,6 +156,10 @@ pub fn get_theme_colors(theme: Themes) -> Theme {
                 background: Color { r: 220, g: 220, b: 220 },
                 text_status_bar: Color { r: 0, g: 0, b: 0 },
                 background_status_bar: Color { r: 180, g: 180, b: 180 },
+                methods: Color { r: 255, g: 0, b: 0 },
+                attributes: Color { r: 243, g: 171, b: 251 },
+                separator: Color { r: 0, g: 0, b: 255 },
+                operators: Color { r: 0, g: 255, b: 0 },
             },
         },
         Themes::Dark => Theme {
@@ -156,6 +176,10 @@ pub fn get_theme_colors(theme: Themes) -> Theme {
                 background: Color { r: 30, g: 30, b: 30 },
                 text_status_bar: Color { r: 255, g: 255, b: 255 },
                 background_status_bar: Color { r: 50, g: 50, b: 50 },
+                methods: Color { r: 255, g: 0, b: 0 },
+                attributes: Color { r: 243, g: 171, b: 251 },
+                separator: Color { r: 0, g: 0, b: 255 },
+                operators: Color { r: 0, g: 255, b: 0 },
             },
         },
         Themes::Neon => Theme {
@@ -172,6 +196,10 @@ pub fn get_theme_colors(theme: Themes) -> Theme {
                 background: Color { r: 0, g: 0, b: 0 },
                 text_status_bar: Color { r: 255, g: 255, b: 255 },
                 background_status_bar: Color { r: 30, g: 30, b: 30 },
+                methods: Color { r: 255, g: 0, b: 0 },
+                attributes: Color { r: 243, g: 171, b: 251 },
+                separator: Color { r: 0, g: 0, b: 255 },
+                operators: Color { r: 0, g: 255, b: 0 },
             },
         },
         Themes::Matrix => Theme {
@@ -188,6 +216,10 @@ pub fn get_theme_colors(theme: Themes) -> Theme {
                 background: Color { r: 0, g: 20, b: 0 },
                 text_status_bar: Color { r: 0, g: 180, b: 0 },
                 background_status_bar: Color { r: 0, g: 30, b: 0 },
+                methods: Color { r: 255, g: 0, b: 0 },
+                attributes: Color { r: 243, g: 171, b: 251 },
+                separator: Color { r: 0, g: 0, b: 255 },
+                operators: Color { r: 0, g: 255, b: 0 },
             },
         },
         Themes::Ocean => Theme {
@@ -204,6 +236,10 @@ pub fn get_theme_colors(theme: Themes) -> Theme {
                 background: Color { r: 30, g: 40, b: 60 },
                 text_status_bar: Color { r: 180, g: 180, b: 180 },
                 background_status_bar: Color { r: 50, g: 60, b: 80 },
+                methods: Color { r: 255, g: 0, b: 0 },
+                attributes: Color { r: 243, g: 171, b: 251 },
+                separator: Color { r: 0, g: 0, b: 255 },
+                operators: Color { r: 0, g: 255, b: 0 },
             },
         },
         Themes::Original | Themes::None => Theme {
