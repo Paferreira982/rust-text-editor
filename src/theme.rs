@@ -95,7 +95,7 @@ pub struct Theme {
 
 impl Theme {
     pub fn default() -> Self {
-        get_theme_colors(Themes::Dark)
+        get_theme_colors(Themes::Ocean)
     }
 
     pub fn get_possibles_themes() -> String {
