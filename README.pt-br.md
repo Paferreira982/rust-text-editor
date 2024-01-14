@@ -1,5 +1,7 @@
 # Rust-Text-Editor
 
+![demo_gif](https://github.com/Paferreira982/rust-text-editor/assets/67207736/8c935ee5-87e8-4219-b14d-b488df1a83a0)
+
 <p align="center">
 If you want to read this file in other language, click on the respective flag <br> <br>
   <a href="https://github.com/Paferreira982/rust-text-editor/blob/main/README.pt-br.md">
