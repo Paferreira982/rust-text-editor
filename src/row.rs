@@ -263,7 +263,7 @@ impl Row {
                 #[allow(clippy::indexing_slicing, clippy::integer_arithmetic)]
                 let next_char = chars[*index + word.len()];
 
-                if !is_separator(next_char) {
+                if !is_separator(next_char) || next_char == '_' {
                     continue;
                 }
             }
@@ -658,7 +658,7 @@ impl Row {
 
             in_ml_comment = false;
             if self.highlight_char(&mut index, opts, *c, &chars)
-                // || self.highlight_comment(&mut index, opts, *c, &chars)
+                || self.highlight_comment(&mut index, opts, *c, &chars)
                 || self.highlight_primary_keywords(&mut index, &opts, &chars)
                 || self.highlight_secondary_keywords(&mut index, &opts, &chars)
                 || self.highlight_operators(&mut index, &opts, &chars)

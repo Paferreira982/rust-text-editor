@@ -1,4 +1,3 @@
-// Result<()
 use crate::Document;
 use crate::Row;
 use crate::TerminalStruct;
@@ -77,20 +76,6 @@ impl Editor {
         let mut initial_status = 
             String::from("HELP: Ctrl-F = find | Ctrl-S = save | Ctrl-T = change theme | Ctrl-Q = quit");
         
-        // let document = if let Some(file_name) = args.get(1) {
-        //     let doc = Document::open(file_name);
-
-        //     if let Ok(doc) = doc {
-        //         doc
-        //     } else {
-        //         initial_status = format!("ERR: Could not open file: {}", file_name);
-        //         Document::default()
-        //     }
-
-        // } else {
-        //     Document::default()
-        // };
-
         let document = if let Some(file_name) = args.get(1) {
             let doc = Document::open(file_name);
 
@@ -102,14 +87,7 @@ impl Editor {
             }
 
         } else {
-            let doc = Document::open("src/editor.rs");
-
-            if let Ok(doc) = doc {
-                doc
-            } else {
-                initial_status = format!("ERR: Could not open file: {}", "src/editor.rs");
-                Document::default()
-            }
+            Document::default()
         };
 
         Self {
