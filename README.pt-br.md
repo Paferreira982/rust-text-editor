@@ -64,13 +64,11 @@ Apesar de não utilizar todas as características apresentadas devido ao escopo 
 
 [x] **Temas** <small><i>Capacidade de escolher entre diferentes temas. Temas disponíveis: light, dark, neon, matrix, ocean and original.</i></small>
 
+[x] **Suporte para a Typescript/Javascript:** <small><i>Capacidade de colorir o texto de acordo com a sintaxe da linguagem Typescript.</i></small>
+
+[x] **Suporte para a Python:** <small><i>Capacidade de colorir o texto de acordo com a sintaxe da linguagem Python.</i></small>
+
 [ ] **Auto Indentação:** <small><i>Capacidade de indentar automaticamente o texto de acordo com a sintaxe do arquivo de texto.</i></small>
-
-[ ] **Copiar e Colar:** <small><i>Capacidade de copiar e colar texto com comandos Ctrl+C e Ctrl+V.</i></small>
-
-[ ] **Suporte para a Typescript/Javascript:** <small><i>Capacidade de colorir o texto de acordo com a sintaxe da linguagem Typescript.</i></small>
-
-[ ] **Suporte para a Python:** <small><i>Capacidade de colorir o texto de acordo com a sintaxe da linguagem Python.</i></small>
 
 ---
 

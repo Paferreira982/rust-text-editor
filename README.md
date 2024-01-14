@@ -64,13 +64,11 @@ Although not utilizing all presented features due to the project's scope, Rust s
 
 [x] **Themes** <small><i>Ability to choose between different themes to colorize the text. Avaliable themes: light, dark, neon, matrix, ocean and original.</i></small>
 
+[x] **Typescript/Javascript Support:** <small><i>Ability to colorize text according to the syntax of the Typescript language.</i></small>
+
+[x] **Python Support:** <small><i>Ability to colorize text according to the syntax of the Python language.</i></small>
+
 [ ] **Auto Indentation:** <small><i>Ability to automatically indent text according to the syntax of the text file.</i></small>
-
-[ ] **Copy and Paste:** <small><i>Ability to copy and paste text with Ctrl+C and Ctrl+V commands.</i></small>
-
-[ ] **Typescript/Javascript Support:** <small><i>Ability to colorize text according to the syntax of the Typescript language.</i></small>
-
-[ ] **Python Support:** <small><i>Ability to colorize text according to the syntax of the Python language.</i></small>
 
 ---
 

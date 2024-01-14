@@ -225,6 +225,7 @@ impl Row {
         if substring.is_empty() {
             return false;
         }
+        
         for (substring_index, c) in substring.chars().enumerate() {
             if let Some(next_char) = chars.get(index.saturating_add(substring_index)) {
                 if *next_char != c {
@@ -262,7 +263,7 @@ impl Row {
                 #[allow(clippy::indexing_slicing, clippy::integer_arithmetic)]
                 let next_char = chars[*index + word.len()];
 
-                if !is_separator(next_char) {
+                if !is_separator(next_char) || next_char == '_' {
                     continue;
                 }
             }
@@ -301,6 +302,182 @@ impl Row {
             opts.secondary_keywords(),
             ThemeType::SecondaryKeywords,
         )
+    }
+
+    fn highlight_operators(
+        &mut self,
+        index: &mut usize,
+        opts: &HighlightingOptions,
+        chars: &[char],
+    ) -> bool {
+
+        if *index > 0 {
+            #[allow(clippy::indexing_slicing, clippy::integer_arithmetic)]
+            let prev_char = chars[*index - 1];
+            if !is_separator(prev_char) {
+                return false;
+            }
+        }
+
+        let keywords = opts.operators();
+
+        for word in keywords {
+            if self.highlight_str(index, &word, chars, ThemeType::Operator) {
+                return true;
+            }
+        }
+        false
+    }
+
+    fn highlight_separators(
+        &mut self,
+        index: &mut usize,
+        opts: &HighlightingOptions,
+        c: char,
+        chars: &[char],
+    ) -> bool {
+        if opts.separators() && c == '.' || c == ':' {
+
+            if c == ':' {
+                let is_prev = if let Some(prev_char) = chars.get(index.saturating_sub(1)) {
+                    if *prev_char == ':' {
+                        true
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                };
+    
+                let is_next = if let Some(next_char) = chars.get(index.saturating_add(1)) {
+                    if *next_char == ':' {
+                        true
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                };
+
+                if is_prev || is_next {
+                    self.highlighting.push(ThemeType::Separator);
+                    *index += 1;
+                } else {
+                    return false;
+                }
+            }
+            
+            self.highlighting.push(ThemeType::Separator);
+            *index += 1;
+            return true;
+        }
+        
+        false
+    }
+
+    fn highlight_methods(
+        &mut self,
+        index: &mut usize,
+        opts: &HighlightingOptions,
+        c: char,
+        chars: &[char],
+    ) -> bool {
+        if opts.methods() {
+            let mut aux_index = index.clone();
+
+            let is_method = loop {
+                if let Some(next_char) = chars.get(aux_index.saturating_add(1)) {
+                    if *next_char == '(' && c != '<' {
+                        break true;
+                    }
+                    
+                    if *next_char == '.' || next_char.is_ascii_whitespace() || *next_char == '<'
+                    || c == '[' || c == '#' || c == '"' || *next_char == ':' || *next_char == '"' {
+                        break false;
+                    }
+
+                    aux_index += 1;
+                    
+                } else {
+                    break false;
+                }
+            };
+
+            if is_method {
+                loop {
+                    if let Some(cur_char) = chars.get(*index) {
+                        if *cur_char == '(' {
+                            self.highlighting.push(ThemeType::None);
+                            *index += 1;
+                            break;
+                        }
+
+                        self.highlighting.push(ThemeType::Method);
+
+                        *index += 1;
+                    } else {
+                        break;
+                    }
+                }
+                return true;
+            }
+
+        }
+
+        false
+    }
+
+    fn highlight_attributes(
+        &mut self,
+        index: &mut usize,
+        opts: &HighlightingOptions,
+        mut c: char,
+        chars: &[char],
+    ) -> bool {
+
+        if *index == 0 {
+            return false;
+        }
+
+        if let Some(prev_char) = chars.get(index.saturating_sub(1)) {
+            c = *prev_char;
+        }
+
+        if opts.atrributes() && c == '.' {
+
+            let mut aux_index = index.clone();
+
+            let is_attribute = loop {
+                if let Some(next_char) = chars.get(aux_index) {
+                    if *next_char == '(' {
+                        break false;
+                    }
+
+                    aux_index += 1;
+                } else {
+                    break true;
+                }
+            };
+
+            if is_attribute {
+                loop {
+                    if let Some(cur_char) = chars.get(*index) {
+                        if cur_char.is_ascii_punctuation() && *cur_char != '_' || cur_char.is_ascii_whitespace() {
+                            break;
+                        }
+
+                        self.highlighting.push(ThemeType::Attribute);
+                        *index += 1;               
+                    } else {
+                        break;
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        false
     }
 
     fn highlight_char(
@@ -484,7 +661,11 @@ impl Row {
                 || self.highlight_comment(&mut index, opts, *c, &chars)
                 || self.highlight_primary_keywords(&mut index, &opts, &chars)
                 || self.highlight_secondary_keywords(&mut index, &opts, &chars)
+                || self.highlight_operators(&mut index, &opts, &chars)
                 || self.highlight_string(&mut index, opts, *c, &chars)
+                || self.highlight_separators(&mut index, opts, *c, &chars)
+                || self.highlight_attributes(&mut index, opts, *c, &chars)
+                || self.highlight_methods(&mut index, opts, *c, &chars)
                 || self.highlight_number(&mut index, opts, *c, &chars)
             {
                 continue;
